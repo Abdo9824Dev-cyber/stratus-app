@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo Store · Cloud Platform</title>
+  <style>
+    :root {
+      --ink: #16140f;
+      --paper: #f3eee4;
+      --card: #fbf8f1;
+      --line: #e0d8c8;
+      --accent: #b8552d;        /* roasted terracotta */
+      --accent-deep: #8f3f1f;
+      --ok: #2f7d4f;
+      --bad: #b23b3b;
+      --muted: #7a7264;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Iowan Old Style", Georgia, "Times New Roman", serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 940px; margin: 0 auto; padding: 0 24px; }
+
+    /* Header */
+    header {
+      border-bottom: 1px solid var(--line);
+      padding: 30px 0 24px;
+    }
+    .topline {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; flex-wrap: wrap;
+    }
+    .brand {
+      font-size: 30px; font-weight: 700; letter-spacing: -0.5px; margin: 0;
+    }
+    .brand .dot { color: var(--accent); }
+    .eyebrow {
+      font-family: "SF Mono", ui-monospace, Menlo, monospace;
+      text-transform: uppercase; letter-spacing: 2.5px;
+      font-size: 11px; color: var(--muted); margin: 0 0 6px;
+    }
+    /* DB status pill */
+    .status {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: "SF Mono", ui-monospace, Menlo, monospace;
+      font-size: 12px; padding: 7px 13px; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--card);
+    }
+    .status .led { width: 9px; height: 9px; border-radius: 50%; }
+    .status.ok  .led { background: var(--ok);  box-shadow: 0 0 0 3px rgba(47,125,79,.18); }
+    .status.bad .led { background: var(--bad); box-shadow: 0 0 0 3px rgba(178,59,59,.18); }
+    .status .label { color: var(--muted); }
+    .status .value { color: var(--ink); font-weight: 600; }
+
+    .lead { color: var(--muted); font-size: 15px; max-width: 60ch; margin: 16px 0 0; }
+
+    /* Product grid */
+    main { padding: 36px 0 60px; }
+    .grid {
+      display: grid; gap: 18px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 22px 20px;
+      display: flex; flex-direction: column;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(22,20,15,.07); }
+    .card .pid {
+      font-family: "SF Mono", ui-monospace, Menlo, monospace;
+      font-size: 11px; color: var(--muted); letter-spacing: 1px;
+    }
+    .card h3 { margin: 8px 0 6px; font-size: 19px; line-height: 1.2; }
+    .card p { margin: 0 0 18px; font-size: 13.5px; color: var(--muted); line-height: 1.5; flex: 1; }
+    .price {
+      font-family: "SF Mono", ui-monospace, Menlo, monospace;
+      font-weight: 600; font-size: 16px; color: var(--accent-deep);
+    }
+    .price .cur { font-size: 12px; color: var(--muted); margin-left: 2px; }
+
+    .empty {
+      border: 1px dashed var(--line); border-radius: 14px;
+      padding: 40px; text-align: center; color: var(--muted);
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 22px 0 40px; color: var(--muted); font-size: 12.5px;
+      font-family: "SF Mono", ui-monospace, Menlo, monospace;
+    }
+    footer code { color: var(--accent-deep); }
+    @media (prefers-reduced-motion: reduce) {
+      .card { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="topline">
+        <div>
+          <p class="eyebrow">Cloud Platform · Demo Payload</p>
+          <h1 class="brand">Desert Roast<span class="dot">.</span></h1>
+        </div>
+        {% if db_ok %}
+        <span class="status ok">
+          <span class="led"></span>
+          <span class="label">database</span>
+          <span class="value">connected</span>
+        </span>
+        {% else %}
+        <span class="status bad">
+          <span class="led"></span>
+          <span class="label">database</span>
+          <span class="value">unreachable</span>
+        </span>
+        {% endif %}
+      </div>
+      <p class="lead">
+        A deliberately small storefront. Its real job is to prove the platform underneath it works:
+        every product below was read live from the database.
+      </p>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      {% if products %}
+      <div class="grid">
+        {% for p in products %}
+        <article class="card">
+          <span class="pid">#{{ "%03d"|format(p.id) }}</span>
+          <h3>{{ p.name }}</h3>
+          <p>{{ p.description }}</p>
+          <span class="price">{{ "%.2f"|format(p.price) }}<span class="cur"> SAR</span></span>
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty">
+        No products yet. Add one with a POST to <code>/api/products</code>.
+      </div>
+      {% endif %}
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      API: <code>/api/products</code> &nbsp;·&nbsp; Health: <code>/healthz</code> &nbsp;·&nbsp; Docs: <code>/docs</code>
+    </div>
+  </footer>
+</body>
+</html>
