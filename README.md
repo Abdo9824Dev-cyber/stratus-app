@@ -79,3 +79,4 @@ store-app/
 Once you're happy running this locally, the cloud phase wraps it with:
 private VPC → Cloud SQL (HA) → Cloud Run → Cloud Build CI/CD → monitoring & alerts,
 all provisioned with Terraform.
+# ci retry Sat Jul  4 12:10:05 PM UTC 2026
